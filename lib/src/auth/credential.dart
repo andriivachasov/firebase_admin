@@ -1,14 +1,16 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:convert';
-import 'package:x509/x509.dart';
-import '../utils/error.dart';
+import 'dart:io';
+
+import 'package:clock/clock.dart';
+import 'package:crypto_keys/crypto_keys.dart';
 import 'package:http/http.dart' as http;
 import 'package:jose/jose.dart';
-import 'package:crypto_keys/crypto_keys.dart';
-import '../credential.dart';
-import 'package:clock/clock.dart';
 import 'package:openid_client/openid_client.dart' as openid;
+import 'package:x509/x509.dart';
+
+import '../credential.dart';
+import '../utils/error.dart';
 
 /// Contains the properties necessary to use service-account JSON credentials.
 class Certificate {
@@ -121,8 +123,8 @@ class ServiceAccountCredential extends _OpenIdCredential
 
   @override
   Future<openid.Credential> createCredential(openid.Client client) async {
-    return await openid.Flow.jwtBearer(client)
-        .callback({'jwt': _createAuthJwt()});
+    final flow = openid.Flow.jwtBearer(client);
+    return await flow.callback({'jwt': _createAuthJwt(), 'state': flow.state});
   }
 }
 
